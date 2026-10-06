@@ -1,0 +1,24 @@
+# Backend .dockerignore
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+.coverage
+htmlcov/
+.pytest_cache/
+.hypothesis/
+*.egg-info/
+dist/
+build/
+.git/
+.gitignore
+README.md
+.env.example
+*.md
+.vscode/
+.idea/
+*.log
+.DS_Store
+Thumbs.db
