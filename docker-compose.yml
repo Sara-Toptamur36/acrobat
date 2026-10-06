@@ -1,0 +1,113 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: music_library_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: music_library
+      MYSQL_USER: music_user
+      MYSQL_PASSWORD: music_password
+    ports:
+      - "3307:3306"  # Exposed on 3307 to avoid local 3306 conflict
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./db/triggers.sql:/docker-entrypoint-initdb.d/02-triggers.sql
+      - ./db/procedures.sql:/docker-entrypoint-initdb.d/03-procedures.sql
+      - ./db/views.sql:/docker-entrypoint-initdb.d/04-views.sql
+    networks:
+      - music_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  seed:
+    image: mysql:8.0
+    container_name: music_library_seed
+    restart: "no"
+    environment:
+      MYSQL_PWD: music_password
+    volumes:
+      - ./db/seed.sql:/seed.sql:ro
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - music_network
+    command: >
+      bash -c "
+        echo 'Waiting for MySQL to be ready...' &&
+        sleep 5 &&
+        echo 'Loading seed data...' &&
+        mysql -h mysql -u music_user -p$$MYSQL_PWD music_library < /seed.sql &&
+        echo 'Seed data loaded successfully!'
+      "
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: music_library_backend
+    restart: unless-stopped
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - DATABASE_URL=mysql+pymysql://music_user:music_password@mysql:3306/music_library
+      - CORS_ORIGINS=*
+      - JWT_SECRET_KEY=your-super-secret-jwt-key-change-in-production
+      - CREATE_ADMIN_USER=true
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend:/app
+      - /app/.venv
+      - ./backend/uploads:/app/uploads
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - music_network
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: music_library_frontend
+    restart: unless-stopped
+    environment:
+      - VITE_API_BASE_URL=http://localhost:5000/api
+      - VITE_APP_NAME=Music Catalog Manager
+      - VITE_APP_VERSION=1.0.0
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - music_network
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:3001"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+volumes:
+  mysql_data:
+
+networks:
+  music_network:
+    driver: bridge

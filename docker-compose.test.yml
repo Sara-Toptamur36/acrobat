@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  mysql-test:
+    image: mysql:8.0
+    container_name: music_catalog_test_db
+    environment:
+      MYSQL_ROOT_PASSWORD: test_root_password
+      MYSQL_DATABASE: music_catalog_test
+      MYSQL_USER: test_user
+      MYSQL_PASSWORD: test_password
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./db/triggers.sql:/docker-entrypoint-initdb.d/02-triggers.sql
+      - ./db/views.sql:/docker-entrypoint-initdb.d/03-views.sql
+      - ./db/procedures.sql:/docker-entrypoint-initdb.d/04-procedures.sql
+    command: --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+    tmpfs:
+      - /var/lib/mysql:rw,noexec,nosuid,size=1024m
