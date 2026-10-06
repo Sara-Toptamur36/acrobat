@@ -1,0 +1,154 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+    @apply bg-acrobat-black text-white antialiased;
+  }
+
+  body {
+    @apply selection:bg-acrobat-primary selection:text-white;
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 12px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #4d4d4d;
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    border-radius: 6px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #808080;
+    border: 3px solid transparent;
+    background-clip: padding-box;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply px-5 py-2 rounded-lg font-bold transition-all duration-200 transform active:scale-98 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center;
+  }
+
+  .btn-primary {
+    @apply bg-acrobat-primary text-white hover:bg-acrobat-primary-light hover:scale-[1.02];
+  }
+
+  .btn-secondary {
+    @apply bg-transparent border border-white/10 text-white hover:border-white hover:bg-white/5 hover:scale-[1.02];
+  }
+
+  .btn-danger {
+    @apply bg-red-600 text-white hover:bg-red-700;
+  }
+
+  .btn-sm {
+    @apply px-4 py-1.5 text-sm;
+  }
+
+  .input {
+    @apply w-full px-4 py-3 bg-acrobat-surface-light border-none rounded-md text-white placeholder-gray-400 focus:ring-1 focus:ring-acrobat-primary transition-all;
+  }
+
+  .input-error {
+    @apply ring-1 ring-red-500;
+  }
+
+  .card {
+    @apply bg-acrobat-surface rounded-lg p-3 transition-all duration-200 hover:bg-acrobat-surface-light shadow-lg cursor-pointer border border-white/5;
+  }
+
+  .card-img-container {
+    @apply relative aspect-square mb-3 overflow-hidden rounded-lg shadow-xl bg-acrobat-dark;
+  }
+
+  .card-img {
+    @apply w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03];
+  }
+
+  .play-button-overlay {
+    @apply absolute bottom-2 right-2 w-10 h-10 bg-acrobat-primary rounded-full flex items-center justify-center opacity-0 translate-y-1 transition-all duration-200 group-hover:opacity-100 group-hover:translate-y-0 shadow-2xl text-white text-xl;
+  }
+
+  .table-container {
+    @apply overflow-hidden rounded-xl bg-acrobat-surface/20 border border-white/5;
+  }
+
+  .table-modern {
+    @apply min-w-full text-left border-collapse;
+  }
+
+  .table-modern th {
+    @apply px-4 py-3 text-[10px] font-black text-acrobat-text-muted uppercase tracking-widest border-b border-white/5;
+  }
+
+  .table-modern tr {
+    @apply transition-colors duration-150 border-b border-white/[0.02] last:border-none;
+  }
+
+  .table-modern tr:hover {
+    @apply bg-white/[0.03];
+  }
+
+  .table-modern td {
+    @apply px-4 py-4 text-sm text-acrobat-text-muted transition-colors group-hover:text-white border-none;
+  }
+
+  .pane {
+    @apply bg-acrobat-dark rounded-xl overflow-hidden shadow-2xl border border-white/5;
+  }
+
+  .sidebar-item {
+    @apply flex items-center px-4 py-3 text-sm font-bold text-acrobat-text-muted hover:text-white transition-all duration-200 gap-4 rounded-xl;
+  }
+
+  .sidebar-item-active {
+    @apply text-white bg-white/5 shadow-sm border border-white/5;
+  }
+}
+
+/* Custom animations and utilities */
+.animate-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.acrobat-gradient {
+  background: linear-gradient(to bottom, #0f172a, #000000);
+}
+
+.acrobat-gradient-surface {
+  background: linear-gradient(to bottom, rgba(139, 26, 26, 0.1), transparent);
+}
+
+/* Fix for any white card or section mentioned by user */
+.bg-white {
+  @apply bg-acrobat-surface;
+}
+
+.text-black {
+  @apply text-acrobat-text !important;
+}
